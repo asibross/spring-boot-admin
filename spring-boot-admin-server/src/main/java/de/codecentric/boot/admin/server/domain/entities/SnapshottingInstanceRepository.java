@@ -24,6 +24,7 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -85,7 +86,7 @@ public class SnapshottingInstanceRepository extends EventsourcingInstanceReposit
     protected Mono<Instance> rehydrateSnapshot(InstanceId id) {
         Instance outdatedSnapshot = this.snapshots.get(id);
         return super.find(id).map(instance -> {
-            if (this.snapshots.replace(id, outdatedSnapshot, instance)) {
+            if (Objects.nonNull(outdatedSnapshot) && this.snapshots.replace(id, outdatedSnapshot, instance)) {
                 return instance;
             } else {
                 return this.snapshots.get(id);
